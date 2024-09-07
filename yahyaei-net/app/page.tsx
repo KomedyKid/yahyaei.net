@@ -1,24 +1,116 @@
 'use client';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 export default function Home() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
   useEffect(() => {
-    const stars = document.getElementById('stars');
-    if (stars) {
-      for (let i = 0; i < 100; i++) {
-        const star = document.createElement('div');
-        star.className = 'star';
-        star.style.top = `${Math.random() * 100}%`;
-        star.style.left = `${Math.random() * 100}%`;
-        star.style.animationDuration = `${Math.random() * 3 + 2}s`;
-        stars.appendChild(star);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    const particles: Particle[] = [];
+    const particleCount = 100;
+    let mouseX = 0;
+    let mouseY = 0;
+
+    canvas.width = width;
+    canvas.height = height;
+
+    class Particle {
+      x: number;
+      y: number;
+      size: number;
+      baseX: number;
+      baseY: number;
+      density: number;
+
+      constructor(x: number, y: number) {
+        this.x = x;
+        this.y = y;
+        this.size = 3;
+        this.baseX = x;
+        this.baseY = y;
+        this.density = (Math.random() * 30) + 1;
+      }
+
+      draw() {
+        ctx!.fillStyle = 'rgba(100, 200, 255, 0.8)';
+        ctx!.beginPath();
+        ctx!.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx!.closePath();
+        ctx!.fill();
+      }
+
+      update() {
+        let dx = mouseX - this.x;
+        let dy = mouseY - this.y;
+        let distance = Math.sqrt(dx * dx + dy * dy);
+        let forceDirectionX = dx / distance;
+        let forceDirectionY = dy / distance;
+        let maxDistance = 100;
+        let force = (maxDistance - distance) / maxDistance;
+        let directionX = forceDirectionX * force * this.density;
+        let directionY = forceDirectionY * force * this.density;
+
+        if (distance < maxDistance) {
+          this.x -= directionX;
+          this.y -= directionY;
+        } else {
+          if (this.x !== this.baseX) {
+            let dx = this.x - this.baseX;
+            this.x -= dx/10;
+          }
+          if (this.y !== this.baseY) {
+            let dy = this.y - this.baseY;
+            this.y -= dy/10;
+          }
+        }
       }
     }
+
+    function init() {
+      for (let i = 0; i < particleCount; i++) {
+        let x = Math.random() * width;
+        let y = Math.random() * height;
+        particles.push(new Particle(x, y));
+      }
+    }
+
+    function animate() {
+      ctx!.clearRect(0, 0, width, height);
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].draw();
+        particles[i].update();
+      }
+      requestAnimationFrame(animate);
+    }
+
+    init();
+    animate();
+
+    window.addEventListener('mousemove', (e) => {
+      mouseX = e.x;
+      mouseY = e.y;
+    });
+
+    window.addEventListener('resize', () => {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+      init();
+    });
+
   }, []);
 
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen p-8 text-center bg-gray-900 overflow-hidden">
-      <div id="stars" className="absolute inset-0"></div>
+      <canvas ref={canvasRef} className="absolute inset-0 z-0"></canvas>
       <main className="relative flex flex-col gap-8 items-center z-10">
         <h1 className="text-6xl font-bold text-blue-400 animate-pulse">
           yahyaei.net
