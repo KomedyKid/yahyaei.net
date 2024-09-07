@@ -5,6 +5,7 @@ export default function Home() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [loading, setLoading] = useState(true);
   const [loadingText, setLoadingText] = useState('Initializing');
+  const [slideOut, setSlideOut] = useState(false);
 
   useEffect(() => {
     const loadingSequence = async () => {
@@ -13,6 +14,8 @@ export default function Home() {
       await new Promise(resolve => setTimeout(resolve, 2000));
       setLoadingText('Access Granted');
       await new Promise(resolve => setTimeout(resolve, 1000));
+      setSlideOut(true);
+      await new Promise(resolve => setTimeout(resolve, 500)); // Wait for slide-out animation
       setLoading(false);
     };
 
@@ -129,7 +132,7 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-blue-400">
+      <div className={`flex flex-col items-center justify-center min-h-screen bg-gray-900 text-blue-400 transition-transform duration-500 ease-in-out ${slideOut ? 'translate-x-full' : ''}`}>
         <div className="text-4xl font-bold mb-8 animate-pulse">{loadingText}</div>
         <div className="w-16 h-16 border-t-4 border-blue-400 border-solid rounded-full animate-spin"></div>
       </div>
@@ -137,7 +140,7 @@ export default function Home() {
   }
 
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen p-8 text-center bg-gray-900 overflow-hidden">
+    <div className="relative flex flex-col items-center justify-center min-h-screen p-8 text-center bg-gray-900 overflow-hidden animate-slide-in">
       <canvas ref={canvasRef} className="absolute inset-0 z-0"></canvas>
       <main className="relative flex flex-col gap-8 items-center z-10">
         <h1 className="text-6xl font-bold text-blue-400 animate-pulse">
