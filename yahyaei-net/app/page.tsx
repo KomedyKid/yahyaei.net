@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8 text-center bg-gray-100 dark:bg-gray-900">
@@ -12,7 +10,7 @@ export default function Home() {
         </p>
         <div className="w-16 h-1 bg-blue-500 my-4"></div>
         <p className="text-sm text-gray-500 dark:text-gray-400 max-w-md">
-          We're working on something exciting. Stay tuned for updates!
+          We&apos;re working on something exciting. Stay tuned for updates!
         </p>
       </main>
       <footer className="mt-16 text-sm text-gray-500 dark:text-gray-400">
