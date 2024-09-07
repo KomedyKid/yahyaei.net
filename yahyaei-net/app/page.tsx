@@ -55,12 +55,12 @@ export default function Home() {
         this.density = (Math.random() * 30) + 1;
       }
 
-      draw(ctx: CanvasRenderingContext2D) {
-        ctx.fillStyle = 'rgba(100, 200, 255, 0.8)';
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.closePath();
-        ctx.fill();
+      draw() {
+        ctx!.fillStyle = 'rgba(100, 200, 255, 0.8)';
+        ctx!.beginPath();
+        ctx!.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx!.closePath();
+        ctx!.fill();
       }
 
       update() {
@@ -100,6 +100,7 @@ export default function Home() {
     }
 
     function animate() {
+      if (!ctx) return;  // Add this check
       ctx.clearRect(0, 0, width, height);
       for (let i = 0; i < particles.length; i++) {
         particles[i].draw(ctx);
