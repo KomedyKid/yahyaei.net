@@ -1,15 +1,29 @@
 'use client';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function Home() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [loading, setLoading] = useState(true);
+  const [loadingText, setLoadingText] = useState('Initializing');
 
   useEffect(() => {
+    const loadingSequence = async () => {
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      setLoadingText('Authenticating');
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      setLoadingText('Access Granted');
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setLoading(false);
+    };
+
+    loadingSequence();
+  }, []);
+
+  useEffect(() => {
+    if (loading) return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
 
     let width = window.innerWidth;
     let height = window.innerHeight;
@@ -106,7 +120,16 @@ export default function Home() {
       init();
     });
 
-  }, []);
+  }, [loading]);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-blue-400">
+        <div className="text-4xl font-bold mb-8 animate-pulse">{loadingText}</div>
+        <div className="w-16 h-16 border-t-4 border-blue-400 border-solid rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen p-8 text-center bg-gray-900 overflow-hidden">
