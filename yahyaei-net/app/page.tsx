@@ -25,6 +25,9 @@ export default function Home() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
     let width = window.innerWidth;
     let height = window.innerHeight;
     const particles: Particle[] = [];
@@ -52,12 +55,12 @@ export default function Home() {
         this.density = (Math.random() * 30) + 1;
       }
 
-      draw() {
-        ctx!.fillStyle = 'rgba(100, 200, 255, 0.8)';
-        ctx!.beginPath();
-        ctx!.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx!.closePath();
-        ctx!.fill();
+      draw(ctx: CanvasRenderingContext2D) {
+        ctx.fillStyle = 'rgba(100, 200, 255, 0.8)';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.fill();
       }
 
       update() {
@@ -88,6 +91,7 @@ export default function Home() {
     }
 
     function init() {
+      particles.length = 0;
       for (let i = 0; i < particleCount; i++) {
         const x = Math.random() * width;
         const y = Math.random() * height;
@@ -96,9 +100,9 @@ export default function Home() {
     }
 
     function animate() {
-      ctx!.clearRect(0, 0, width, height);
+      ctx.clearRect(0, 0, width, height);
       for (let i = 0; i < particles.length; i++) {
-        particles[i].draw();
+        particles[i].draw(ctx);
         particles[i].update();
       }
       requestAnimationFrame(animate);
