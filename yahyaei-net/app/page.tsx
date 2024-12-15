@@ -1,30 +1,11 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
+import { Navbar } from '../components/Navbar';
 
 export default function Home() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [loading, setLoading] = useState(true);
-  const [loadingText, setLoadingText] = useState('Initializing');
-  const [slideOut, setSlideOut] = useState(false);
 
   useEffect(() => {
-    const loadingSequence = async () => {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setLoadingText('Authenticating');
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      setLoadingText('Access Granted');
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setSlideOut(true);
-      await new Promise(resolve => setTimeout(resolve, 500)); // Wait for slide-out animation
-      setLoading(false);
-    };
-
-    loadingSequence();
-  }, []);
-
-  useEffect(() => {
-    if (loading) return;
-
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -83,11 +64,11 @@ export default function Home() {
         } else {
           if (this.x !== this.baseX) {
             const dx = this.x - this.baseX;
-            this.x -= dx/10;
+            this.x -= dx / 10;
           }
           if (this.y !== this.baseY) {
             const dy = this.y - this.baseY;
-            this.y -= dy/10;
+            this.y -= dy / 10;
           }
         }
       }
@@ -127,32 +108,20 @@ export default function Home() {
       canvas.height = height;
       init();
     });
-
-  }, [loading]);
-
-  if (loading) {
-    return (
-      <div className={`flex flex-col items-center justify-center min-h-screen bg-gray-900 text-blue-400 transition-transform duration-500 ease-in-out ${slideOut ? 'translate-x-full' : ''}`}>
-        <div className="text-4xl font-bold mb-8 animate-pulse">{loadingText}</div>
-        <div className="w-16 h-16 border-t-4 border-blue-400 border-solid rounded-full animate-spin"></div>
-      </div>
-    );
-  }
+  }, []);
 
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen p-8 text-center bg-gray-900 overflow-hidden animate-slide-in">
+    <div className="relative flex flex-col items-center justify-center min-h-screen p-8 text-center bg-gray-900 overflow-hidden animate-fade-smooth">
+      <Navbar />
       <canvas ref={canvasRef} className="absolute inset-0 z-0"></canvas>
       <main className="relative flex flex-col gap-8 items-center z-10">
         <h1 className="text-6xl font-bold text-blue-400 animate-pulse">
           yahyaei.net
         </h1>
         <p className="text-2xl text-gray-300 animate-fade-in-up">
-          Coming Soon
+          Soon to be amazing
         </p>
         <div className="w-24 h-1 bg-blue-500 my-4 animate-expand"></div>
-        <p className="text-sm text-gray-400 max-w-md animate-fade-in">
-          We&apos;re crafting something extraordinary. Prepare for launch!
-        </p>
       </main>
       <footer className="relative mt-16 text-sm text-gray-500 z-10">
         <p>© {new Date().getFullYear()} yahyaei.net. All rights reserved.</p>
