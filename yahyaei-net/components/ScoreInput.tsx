@@ -65,10 +65,11 @@ export function ScoreInput({ hlCount, slCount, onCalculate }: ScoreInputProps) {
     }
 
     // Combine HL and SL subjects with an added "level" property for calculation purposes.
-    const allSubjects = [
-      ...hlScores.map((subject) => ({ ...subject, level: 'HL' })),
-      ...slScores.map((subject) => ({ ...subject, level: 'SL' }))
+    const allSubjects: SubjectScore[] = [
+      ...hlScores.map((subject) => ({ ...subject, level: 'HL' as 'HL' })),
+      ...slScores.map((subject) => ({ ...subject, level: 'SL' as 'SL' }))
     ];
+    
 
     // Use the new calculation function (which implements the 60/40 required weighting).
     const overallScore = calculateOmaniScore(allSubjects);
