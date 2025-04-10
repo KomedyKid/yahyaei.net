@@ -2,7 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { HL_CONVERSION, SL_CONVERSION } from '../utils/constants';
-import { calculateOmaniScore } from '../utils/calculations';
+// Import both the function and the SubjectScore type from calculations.ts.
+import { calculateOmaniScore, SubjectScore } from '../utils/calculations';
+
+// Rename your local state type to avoid conflict.
+interface SubjectState {
+  score: number;
+  required: boolean;
+}
 
 interface ScoreInputProps {
   hlCount: number;
@@ -10,16 +17,10 @@ interface ScoreInputProps {
   onCalculate: (score: number) => void;
 }
 
-// Define a type for each subject's state.
-interface SubjectScore {
-  score: number;
-  required: boolean;
-}
-
 export function ScoreInput({ hlCount, slCount, onCalculate }: ScoreInputProps) {
   // Use arrays of objects to track score and 'required' status.
-  const [hlScores, setHlScores] = useState<SubjectScore[]>([]);
-  const [slScores, setSlScores] = useState<SubjectScore[]>([]);
+  const [hlScores, setHlScores] = useState<SubjectState[]>([]);
+  const [slScores, setSlScores] = useState<SubjectState[]>([]);
 
   // Whenever hlCount changes, initialize HL subjects.
   useEffect(() => {
@@ -64,14 +65,14 @@ export function ScoreInput({ hlCount, slCount, onCalculate }: ScoreInputProps) {
       return;
     }
 
-    // Combine HL and SL subjects with an added "level" property for calculation purposes.
+    // Map your stored subject state to the type expected by calculateOmaniScore,
+    // explicitly adding the 'level' property as a literal ("HL" or "SL").
     const allSubjects: SubjectScore[] = [
       ...hlScores.map((subject) => ({ ...subject, level: 'HL' as 'HL' })),
       ...slScores.map((subject) => ({ ...subject, level: 'SL' as 'SL' }))
     ];
-    
 
-    // Use the new calculation function (which implements the 60/40 required weighting).
+    // Now call the calculation function with the correctly typed array.
     const overallScore = calculateOmaniScore(allSubjects);
     onCalculate(overallScore);
   };
@@ -153,8 +154,14 @@ export function ScoreInput({ hlCount, slCount, onCalculate }: ScoreInputProps) {
                   onChange={(e) => handleRequiredChange(index, false, e.target.checked)}
                   className="mr-1"
                 />
-                <label htmlFor={`sl-required-${index}`} className="text-sm text-gray-300">
+                <label htmlFor={`sl-required-${index}`} className="text-sm text-gray-300 flex items-center">
                   Required
+                  <span
+                    className="ml-1 cursor-help rounded-full border border-gray-500 px-1 text-xs"
+                    title="A required subject is mandatory for your chosen program. Its score is counted in both the overall average (40%) and the required average (60%)."
+                  >
+                    ?
+                  </span>
                 </label>
               </div>
             </div>
