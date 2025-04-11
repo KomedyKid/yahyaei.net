@@ -2,10 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { HL_CONVERSION, SL_CONVERSION } from '../utils/constants';
-// Import both the function and the SubjectScore type from calculations.ts.
 import { calculateOmaniScore, SubjectScore } from '../utils/calculations';
 
-// Rename your local state type to avoid conflict.
 interface SubjectState {
   score: number;
   required: boolean;
@@ -18,16 +16,19 @@ interface ScoreInputProps {
 }
 
 export function ScoreInput({ hlCount, slCount, onCalculate }: ScoreInputProps) {
-  // Use arrays of objects to track score and 'required' status.
+  // State for HL and SL subjects.
   const [hlScores, setHlScores] = useState<SubjectState[]>([]);
   const [slScores, setSlScores] = useState<SubjectState[]>([]);
+  
+  // New state for TOK/EE extra points (0, 1, 2, or 3).
+  const [tokEEScore, setTokEEScore] = useState<number>(0);
 
-  // Whenever hlCount changes, initialize HL subjects.
+  // Initialize HL subjects whenever hlCount changes.
   useEffect(() => {
     setHlScores(Array.from({ length: hlCount }, () => ({ score: 7, required: false })));
   }, [hlCount]);
 
-  // Whenever slCount changes, initialize SL subjects.
+  // Initialize SL subjects whenever slCount changes.
   useEffect(() => {
     setSlScores(Array.from({ length: slCount }, () => ({ score: 7, required: false })));
   }, [slCount]);
@@ -45,7 +46,7 @@ export function ScoreInput({ hlCount, slCount, onCalculate }: ScoreInputProps) {
     }
   };
 
-  // Handle checkbox changes to mark a subject as required or not.
+  // Handle checkbox changes to mark a subject as required.
   const handleRequiredChange = (index: number, isHL: boolean, value: boolean) => {
     if (isHL) {
       const newScores = [...hlScores];
@@ -58,6 +59,7 @@ export function ScoreInput({ hlCount, slCount, onCalculate }: ScoreInputProps) {
     }
   };
 
+  // Calculate the overall score including TOK/EE extra points.
   const calculateAverage = () => {
     const totalSubjects = hlCount + slCount;
     if (totalSubjects === 0) {
@@ -65,16 +67,17 @@ export function ScoreInput({ hlCount, slCount, onCalculate }: ScoreInputProps) {
       return;
     }
 
-    // Map your stored subject state to the type expected by calculateOmaniScore,
-    // explicitly adding the 'level' property as a literal ("HL" or "SL").
     const allSubjects: SubjectScore[] = [
-      ...hlScores.map((subject) => ({ ...subject, level: 'HL' as 'HL' })),
-      ...slScores.map((subject) => ({ ...subject, level: 'SL' as 'SL' }))
+      ...hlScores.map((subject) => ({ ...subject, level: 'HL' as const })),
+      ...slScores.map((subject) => ({ ...subject, level: 'SL' as const }))
     ];
 
-    // Now call the calculation function with the correctly typed array.
+    // Calculate the score from subject marks.
     const overallScore = calculateOmaniScore(allSubjects);
-    onCalculate(overallScore);
+
+    // Incorporate the TOK/EE extra points.
+    const finalScore = overallScore + tokEEScore;
+    onCalculate(finalScore);
   };
 
   return (
@@ -86,10 +89,7 @@ export function ScoreInput({ hlCount, slCount, onCalculate }: ScoreInputProps) {
           {hlScores.map((subject, index) => (
             <div key={`hl-${index}`} className="mb-2 flex items-center space-x-4">
               <div>
-                <label
-                  htmlFor={`hl-${index}`}
-                  className="block text-sm font-medium text-gray-300"
-                >
+                <label htmlFor={`hl-${index}`} className="block text-sm font-medium text-gray-300">
                   HL Subject {index + 1}
                 </label>
                 <input
@@ -129,10 +129,7 @@ export function ScoreInput({ hlCount, slCount, onCalculate }: ScoreInputProps) {
           {slScores.map((subject, index) => (
             <div key={`sl-${index}`} className="mb-2 flex items-center space-x-4">
               <div>
-                <label
-                  htmlFor={`sl-${index}`}
-                  className="block text-sm font-medium text-gray-300"
-                >
+                <label htmlFor={`sl-${index}`} className="block text-sm font-medium text-gray-300">
                   SL Subject {index + 1}
                 </label>
                 <input
@@ -167,6 +164,23 @@ export function ScoreInput({ hlCount, slCount, onCalculate }: ScoreInputProps) {
             </div>
           ))}
         </div>
+      </div>
+      {/* TOK/EE Extra Points Input */}
+      <div className="mb-4">
+        <label htmlFor="tok-ee-points" className="block text-sm font-medium text-gray-300">
+          TOK/EE Extra Points
+        </label>
+        <select
+          id="tok-ee-points"
+          value={tokEEScore}
+          onChange={(e) => setTokEEScore(Number(e.target.value))}
+          className="mt-1 block w-full rounded-md bg-gray-800 border border-gray-600 text-gray-100 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+        >
+          <option value="0">0</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+        </select>
       </div>
       <button
         onClick={calculateAverage}
