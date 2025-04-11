@@ -73,11 +73,9 @@ export function ScoreInput({ hlCount, slCount, onCalculate }: ScoreInputProps) {
     ];
 
     // Calculate the score from subject marks.
-    const overallScore = calculateOmaniScore(allSubjects);
+    const overallScore = calculateOmaniScore(allSubjects, tokEEScore);
 
-    // Incorporate the TOK/EE extra points.
-    const finalScore = overallScore + tokEEScore;
-    onCalculate(finalScore);
+    onCalculate(overallScore);
   };
 
   return (
