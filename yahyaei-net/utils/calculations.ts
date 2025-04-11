@@ -16,19 +16,27 @@ export interface SubjectScore {
  *
  * If no subjects are marked as required, the overall average is used for both portions.
  *
+ * With TOK/EE points, for each TOK/EE point the overall total is increased by 5 before dividing by the total number of subjects.
+ *
+ * For example, if there are 3 TOK/EE points and 6 subjects, then an extra 15 points (3*5) are added to the overall total before dividing by 6.
+ *
  * @param subjects Array of subjects with their IB score, level, and "required" flag.
+ * @param tokEEScore (Optional) The TOK/EE extra points (0,1,2,3). Defaults to 0.
  * @returns The weighted overall Omani score.
  */
-export function calculateOmaniScore(subjects: SubjectScore[]): number {
+export function calculateOmaniScore(subjects: SubjectScore[], tokEEScore: number = 0): number {
   const totalSubjects = subjects.length;
   if (totalSubjects === 0) return 0;
 
-  // Calculate overall average for all subjects.
+  // Calculate overall total from all subjects.
   const overallTotal = subjects.reduce((sum, subject) => {
     const conversion = subject.level === 'HL' ? HL_CONVERSION[subject.score] : SL_CONVERSION[subject.score];
     return sum + conversion;
   }, 0);
-  const overallAvg = overallTotal / totalSubjects;
+
+  // Incorporate TOK/EE extra points into the overall component:
+  // For each TOK/EE point, add 5 to the total before dividing by the number of subjects.
+  const overallAvg = (overallTotal + tokEEScore * 5) / totalSubjects;
 
   // Calculate average for required subjects.
   const requiredSubjects = subjects.filter(subject => subject.required);
@@ -47,7 +55,6 @@ export function calculateOmaniScore(subjects: SubjectScore[]): number {
   // Official weighted formula: overallAvg contributes 40% and requiredAvg contributes 60%.
   return overallAvg * 0.4 + requiredAvg * 0.6;
 }
-
 
 
 /**
@@ -95,6 +102,7 @@ function combinationsOfIndices(total: number, k: number): number[][] {
  * With the new weighting scheme:
  *   - The average for subjects marked as required (by the user) contributes 60%.
  *   - The average for the remaining subjects contributes 40%.
+ *   - Additionally, TOK/EE extra points contribute by adding 5 points per TOK/EE point to the overall component before averaging.
  *
  * For each combination of scores (for HL and SL subjects), we enumerate every way
  * to mark exactly `requiredCount` subjects as required (from the total subjects).
@@ -105,13 +113,15 @@ function combinationsOfIndices(total: number, k: number): number[][] {
  * @param slCount Number of SL subjects.
  * @param requiredCount Number of subjects (from the total) that are required.
  * @param desiredAvg The target weighted average score.
+ * @param tokEEScore (Optional) The TOK/EE extra points. Defaults to 0.
  * @returns An array of solution strings.
  */
 export function calculateRequiredGrades(
   hlCount: number,
   slCount: number,
   requiredCount: number,
-  desiredAvg: number
+  desiredAvg: number,
+  tokEEScore: number = 0
 ): string[] {
   const totalSubjects = hlCount + slCount;
   const hlCombos = hlCount > 0 ? combinationsWithReplacement([1, 2, 3, 4, 5, 6, 7], hlCount) : [[]];
@@ -153,15 +163,16 @@ export function calculateRequiredGrades(
           }
         }
         const requiredAvg = requiredScores.length > 0 ? requiredSum / requiredScores.length : 0;
-        const nonRequiredAvg =
-          nonRequiredScores.length > 0 ? nonRequiredSum / nonRequiredScores.length : 0;
+        // Incorporate the TOK/EE bonus in the overall component (non-required + required overall)
+        const adjustedOverallTotal = conversions.reduce((sum, value) => sum + value, 0) + tokEEScore * 5;
+        const overallAvg = adjustedOverallTotal / totalSubjects;
         let weightedAverage = 0;
         if (requiredScores.length > 0 && nonRequiredScores.length > 0) {
-          weightedAverage = requiredAvg * 0.6 + nonRequiredAvg * 0.4;
+          weightedAverage = overallAvg * 0.4 + requiredAvg * 0.6;
         } else if (requiredScores.length > 0) {
           weightedAverage = requiredAvg;
         } else {
-          weightedAverage = nonRequiredAvg;
+          weightedAverage = overallAvg;
         }
 
         if (weightedAverage >= desiredAvg) {
