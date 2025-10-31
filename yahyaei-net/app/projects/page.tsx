@@ -15,9 +15,7 @@ type Project = {
 
 const projects: Project[] = [
   {
-    title: 'RivalsLog.com',
-    description:
-      'Match analytics platform for Rivals of Aether players with timelines, stat breakdowns, and a polished web UI.',
+    title: 'Rivals Log',
     tech: ['Next.js', 'TypeScript', 'Three.js', 'Prisma', 'Tailwind CSS'],
     repoUrl: 'https://github.com/KomedyKid/Rivals-Log',
     liveUrl: 'https://rivalslog.com',
@@ -26,8 +24,6 @@ const projects: Project[] = [
   },
   {
     title: 'Flight Tracker',
-    description:
-      'Desktop toolkit that imports live schedules, visualises routes, and manages passengers with a Swing-based UI.',
     tech: ['Java', 'Swing', 'Data Structures', 'File I/O'],
     repoUrl: 'https://github.com/KomedyKid/Flight-Tracker',
     stars: 0,
