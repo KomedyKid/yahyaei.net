@@ -1,6 +1,16 @@
 'use client';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type SVGProps } from 'react';
+import { Github } from 'lucide-react';
 import { Navbar } from '../components/Navbar';
+
+const LinkedInLogo = (props: SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 448 512" aria-hidden="true" {...props}>
+    <path
+      fill="currentColor"
+      d="M100.3 448H7.4V148.9h92.9zm-46.4-338A53.7 53.7 0 010 56.3 53.7 53.7 0 0153.9 0 53.7 53.7 0 01107.8 56.3a53.7 53.7 0 01-54 53.7zM447.9 448h-92.7V302.4c0-34.7-.7-79.3-48.3-79.3-48.3 0-55.8 37.7-55.8 76.7V448h-92.7V148.9h88.9v40.8h1.3c12.4-23.5 42.6-48.3 87.9-48.3 94 0 111.3 61.9 111.3 142.3z"
+    />
+  </svg>
+);
 
 export default function Home() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -122,6 +132,34 @@ export default function Home() {
           Soon to be amazing
         </p>
         <div className="w-24 h-1 bg-blue-500 my-4 animate-expand"></div>
+        <div className="flex flex-col sm:flex-row items-center gap-4 animate-fade-in-up">
+          <a
+            href="https://www.linkedin.com/in/salimyahyaei/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group relative flex h-14 w-14 items-center overflow-hidden rounded-full bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 text-white shadow-lg shadow-blue-900/50 transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-2xl hover:w-60 focus-visible:-translate-y-1 focus-visible:shadow-2xl focus-visible:w-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
+          >
+            <span className="flex h-full w-14 flex-shrink-0 items-center justify-center transition-transform duration-300 group-hover:translate-x-1">
+              <LinkedInLogo className="h-6 w-6" />
+            </span>
+            <span className="max-w-0 whitespace-nowrap text-base font-semibold opacity-0 transition-all duration-300 group-hover:ml-3 group-hover:max-w-xs group-hover:opacity-100 group-focus-visible:ml-3 group-focus-visible:max-w-xs group-focus-visible:opacity-100">
+              Connect on LinkedIn
+            </span>
+          </a>
+          <a
+            href="https://github.com/KomedyKid"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group relative flex h-14 w-14 items-center overflow-hidden rounded-full border border-gray-700 bg-gray-900/60 text-gray-200 shadow-lg shadow-black/30 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-gray-400 hover:bg-gray-800 hover:w-60 focus-visible:-translate-y-1 focus-visible:border-gray-400 focus-visible:bg-gray-800 focus-visible:shadow-2xl focus-visible:w-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/60"
+          >
+            <span className="flex h-full w-14 flex-shrink-0 items-center justify-center transition-transform duration-300 group-hover:translate-x-1">
+              <Github className="h-6 w-6" />
+            </span>
+            <span className="max-w-0 whitespace-nowrap text-base font-semibold opacity-0 transition-all duration-300 group-hover:ml-3 group-hover:max-w-xs group-hover:opacity-100 group-focus-visible:ml-3 group-focus-visible:max-w-xs group-focus-visible:opacity-100">
+              Explore GitHub
+            </span>
+          </a>
+        </div>
       </main>
       <footer className="relative mt-16 text-sm text-gray-500 z-10">
         <p>© {new Date().getFullYear()} yahyaei.net. All rights reserved.</p>
